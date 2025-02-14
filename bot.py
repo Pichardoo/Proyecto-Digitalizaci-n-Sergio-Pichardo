@@ -32,24 +32,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         reply_markup=reply_markup
     )
 
-# Función que maneja cuando un miembro se une al chat
-async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    for miembro in update.message.new_chat_members:
-        # Aquí llamamos a la función start para que ejecute el comando cuando un miembro se una
-        await start(update, context)
-
-async def main() -> None:
-    # Token del bot
-    token = "7632006497:AAHf669gCx8w0aLpI8AYNpFbhbd-W8tMxo0"
-    application = Application.builder().token(token).build()
-
-    # Registra el manejador para los nuevos miembros
-    application.add_handler(ChatMemberHandler(nuevo_miembro, ChatMemberHandler.MY_CHAT_MEMBER))
-
-    # Inicia el bot
-    await application.run_polling()
-
-
 # Función para manejar la acción de añadir un recordatorio
 async def add_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.callback_query.answer()
