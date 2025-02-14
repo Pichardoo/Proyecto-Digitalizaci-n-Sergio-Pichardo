@@ -15,7 +15,9 @@ minute_selected = None  # Minuto seleccionado
 reminder_title = None  # Título del recordatorio
 reminder_message = None  # Mensaje del recordatorio
 user_state = {}  # Guardamos el estado de cada usuario
-
+scheduler = AsyncIOScheduler()
+scheduler.start()
+    
 # Función para el comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Crear los botones del menú
@@ -23,6 +25,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton("Añadir Recordatorio", callback_data="add_reminder")],
         [InlineKeyboardButton("Lista de Recordatorios", callback_data="list_reminders")],
         [InlineKeyboardButton("Eliminar Recordatorio", callback_data="delete_reminder")],
+         [InlineKeyboardButton("Editar Recordatorio", callback_data="edit_reminder")],
+        [InlineKeyboardButton("Configurar", callback_data="config")],
         [InlineKeyboardButton("Help", callback_data="help")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -31,6 +35,49 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "¡Hola! ¿Qué te gustaría hacer?",
         reply_markup=reply_markup
     )
+
+
+# Notificación automática de recordatorio
+async def send_reminder(context: ContextTypes.DEFAULT_TYPE) -> None:
+    job = context.job
+    await context.bot.send_message(job.chat_id, text=f"🔔 Recordatorio: {job.data}")
+
+# Función para añadir un recordatorio con notificación automática
+def schedule_reminder(chat_id, reminder_time, reminder_text, context):
+    delay = (reminder_time - datetime.now()).total_seconds()
+    if delay > 0:
+        context.job_queue.run_once(send_reminder, delay, chat_id=chat_id, data=reminder_text)
+
+# Función para manejar la lista de recordatorios
+async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    if reminders:
+        reminders_text = "\n\n".join([f"{reminder[0].strftime('%Y-%m-%d %H:%M')} - {reminder[1]}: {reminder[2]}" for reminder in reminders])
+        await update.callback_query.message.reply_text(f"Lista de recordatorios:\n{reminders_text}")
+    else:
+        await update.callback_query.message.reply_text("No tienes recordatorios aún.")
+
+# Función para editar un recordatorio existente
+async def edit_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    user_state[update.callback_query.from_user.id] = "EDIT"
+    await update.callback_query.message.reply_text("Escribe el ID del recordatorio que quieres editar.")
+
+# Función para configurar zona horaria y formato de fecha
+async def config(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    await update.callback_query.message.reply_text("Opciones de configuración en desarrollo...")
+
+# Función para sugerencias de recordatorios con OpenAI
+async def suggest_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.message.from_user.id
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt="Sugiere un recordatorio basado en actividades diarias comunes.",
+        max_tokens=50
+    )
+    suggestion = response['choices'][0]['text'].strip()
+    await update.message.reply_text(f"🤖 Sugerencia de recordatorio: {suggestion}")
 
 # Función para manejar la acción de añadir un recordatorio
 async def add_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -209,7 +256,18 @@ def main() -> None:
     # Manejo del título y mensaje de recordatorio
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_title))
 
+    application = Application.builder().token(TOKEN).build()
+    
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(list_reminders, pattern="list_reminders"))
+    application.add_handler(CallbackQueryHandler(edit_reminder, pattern="edit_reminder"))
+    application.add_handler(CallbackQueryHandler(config, pattern="config"))
+    application.add_handler(CommandHandler("sugerir", suggest_reminder))
+    
+    application.run_polling()
+
     application.run_polling()
 
 if __name__ == "__main__":
     main()
+2
