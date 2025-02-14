@@ -16,8 +16,8 @@ reminder_title = None  # Título del recordatorio
 reminder_message = None  # Mensaje del recordatorio
 user_state = {}  # Guardamos el estado de cada usuario
 
-# Función para el comando /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+# Función para el comando /recordatorio
+async def recordatorio(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Crear los botones del menú
     keyboard = [
         [InlineKeyboardButton("Añadir Recordatorio📩", callback_data="add_reminder")],
@@ -204,7 +204,7 @@ def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
     # Comandos
-    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("recordatorio", recordatorio))
 
     # Menú interactivo
     application.add_handler(CallbackQueryHandler(add_reminder, pattern="add_reminder"))
