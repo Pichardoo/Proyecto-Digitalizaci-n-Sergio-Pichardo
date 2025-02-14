@@ -40,7 +40,7 @@ async def nuevo_miembro(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 async def main() -> None:
     # Token del bot
-    token = "TU_TOKEN_AQUI"
+    token = "7632006497:AAHf669gCx8w0aLpI8AYNpFbhbd-W8tMxo0"
     application = Application.builder().token(token).build()
 
     # Registra el manejador para los nuevos miembros
