@@ -20,15 +20,15 @@ user_state = {}  # Guardamos el estado de cada usuario
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Crear los botones del menú
     keyboard = [
-        [InlineKeyboardButton("Añadir Recordatorio", callback_data="add_reminder")],
-        [InlineKeyboardButton("Lista de Recordatorios", callback_data="list_reminders")],
-        [InlineKeyboardButton("Eliminar Recordatorio", callback_data="delete_reminder")],
-        [InlineKeyboardButton("Help", callback_data="help")],
+        [InlineKeyboardButton("Añadir Recordatorio📩", callback_data="add_reminder")],
+        [InlineKeyboardButton("Lista de Recordatorios📃", callback_data="list_reminders")],
+        [InlineKeyboardButton("Eliminar Recordatorio❌", callback_data="delete_reminder")],
+        [InlineKeyboardButton("Help❓", callback_data="help")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await update.message.reply_text(
-        "¡Hola! ¿Qué te gustaría hacer?",
+        "¡Hola!😊 ¿Qué te gustaría hacer?📝",
         reply_markup=reply_markup
     )
 
