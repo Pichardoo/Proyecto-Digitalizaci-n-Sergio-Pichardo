@@ -26,7 +26,7 @@ Este proyecto es un bot diseñado para **Discord o Telegram** que permite almace
    git clone https://github.com/tuusuario/tu-repositorio.git
 
 
-2. Abre telegram y busca el bot pixard y escribe /recordatorio
+2. Abre telegram y busca el bot "pixard" si no sale busca "FlashReminder_bot" y escribe /recordatorio
 
 
 
